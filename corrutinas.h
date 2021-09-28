@@ -7,7 +7,7 @@
 #include <math.h>
 
 #define MAX_HILOS 25 //maxima cantidad de hilos creados (requerimiento del proyecto)
-#define QUANTUM 100000 //cantidad de iteraciones por turno
+#define QUANTUM 1000 //cantidad de iteraciones por turno
 
 typedef struct parametros{
     int M; //maximas iteraciones
@@ -49,3 +49,8 @@ void crear_hilo(void* funcion, parametros* param, int tiquetes); //funcion encar
 void administrador_hilos(); //funcion encargada de administrar los hilos, decide, junto con lottery, cuales hilos van al CPU
 void finalizar_hilo(); //funcion encargada de eliminar el hilo, aya que este ya termino con sus funciones
 hilo* sorteo(); //funcion encargada de sortear el siguiente hilo a entrar al CPU. Es una implementacion simple de Lottery Shecduling
+
+void pi(parametros* args); //funcion que recorre en hilo, en este caso calcula el numero pi
+void ln(parametros* args); //funcion que recorre en hilo, en este caso calcula el lagoritmo natural de un numero X
+void ex(parametros* args); //funcion que recorre en hilo, en este caso calcula e elevado a un numero X
+void sinxt(parametros* args); //funcion que recorre en hilo, en este caso calcula el sen de un numero X
