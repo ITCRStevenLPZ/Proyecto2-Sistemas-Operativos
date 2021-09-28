@@ -1,8 +1,6 @@
 //Proyecto2 SO (Ronald Esquivel, Ricardo Murillo y Dylan Gonzalez)
 #include "corrutinas.h"
 
-int contador_id = 0; // variable global que sirve para asignar los ids diferentes a cada hilo.
-
 void agregar_hilo(hilo* nuevo_hilo){ //funcion encargada de insertar un nuevo hilo a la lista de hilos
 
     if(primero_lottery == NULL){
@@ -74,7 +72,7 @@ hilo* sorteo(){ //funcion encargada de sortear el siguiente hilo a entrar al CPU
 
 
 
-void crear_hilo(void* funcion, void* param, int tiquetes){ //funcion encargada de crear el hilo y asignarle sus atributos
+void crear_hilo(void* funcion, parametros* param, int tiquetes){ //funcion encargada de crear el hilo y asignarle sus atributos
     hilo* nodo =(hilo*)malloc(sizeof(hilo));
     nodo->estado = 1; //el hilo esta listo
     nodo->id = contador_id++;
@@ -111,7 +109,7 @@ void administrador_hilos(){ //funcion encargada de administrar los hilos, decide
 
     }else{
         
-        en_CPU->estado = 2; //el
+        en_CPU->estado = 2; //el nodo esta en run
 
         if (sigsetjmp(buffer_administrador,1) != 0) { //quiere decir que el thread en el CPU se pauso o termino su ejecucion
             administrador_hilos();
@@ -142,22 +140,20 @@ void finalizar_hilo(){ //funcion encargada de eliminar el hilo, aya que este ya 
 }
 
 
-void prueba(void* M){ //funcion de prueba que va a recorrer el hilo
-    int m = *((int *)M);
+void prueba(parametros* args){ //funcion de prueba que va a recorrer el hilo
     long double sum = 0;
     int i;
-    for (i = 1; i <= m; i++){
+    for (i = 1; i <= args->M; i++){
         if(i % QUANTUM == 0){
             printf("Iteracion = %d - Resultado por ahora = %Lf \n", i, sum);
             en_CPU->i = i;
             en_CPU->sum = sum; //se guarda el entorno local
-            en_CPU->m = m;
             if(sigsetjmp(en_CPU->buffer_hilo,1) == 0){
                 siglongjmp(buffer_administrador,1);      // se pausa el hilo
             }
             i = en_CPU->i;
-            sum = en_CPU->sum; //se asigna en el entorno local, el que se guardo antes de que se pusara
-            m = en_CPU->m;
+            sum = en_CPU->sum; //se asigna en el entorno local, el que se guardo antes de que se pausara
+            args = en_CPU->param;
         }
         long double pi = (1/(double)pow(i, 2));
         sum += pi;
@@ -169,19 +165,20 @@ void prueba(void* M){ //funcion de prueba que va a recorrer el hilo
 int main(){
     srand(time(NULL));
     tiquetes_totales = 0;
+    contador_id = 0;
     en_CPU = NULL;
 
-    int* M = (int*)malloc(sizeof(int));
-    *M = 1000000;
-    crear_hilo(&prueba, (void*) M, 50);
+    parametros* param =(parametros*)malloc(sizeof(parametros));
+    param->M = 1000000;
+    crear_hilo(&prueba, (parametros*) param, 50);
 
-    int* M2 = (int*)malloc(sizeof(int));
-    *M2 = 1000000;
-    crear_hilo(&prueba, (void*) M2, 75);
+    parametros* param1 =(parametros*)malloc(sizeof(parametros));
+    param1->M = 1000000;
+    crear_hilo(&prueba, (parametros*) param1, 75);
 
-    int* M3 = (int*)malloc(sizeof(int));
-    *M2 = 100000;
-    crear_hilo(&prueba, (void*) M3, 150);
+    parametros* param2 =(parametros*)malloc(sizeof(parametros));
+    param2->M = 100000;
+    crear_hilo(&prueba, (parametros*) param2, 150);
 
     administrador_hilos();
     return 0;
