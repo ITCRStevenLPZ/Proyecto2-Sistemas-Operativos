@@ -1,4 +1,17 @@
-//Proyecto2 SO (Ronald Esquivel, Ricardo Murillo y Dylan Gonzalez)
+/*
+ * Instituto Tecnologico de Costa Rica
+ * Escuela de Ingenieria en Computacion
+ * Sistemas Operativos
+ *
+ * Segundo proyecto de Sistemas Operativos
+ * Ronald Esquivel Lopez
+ * Ricardo Murillo Jimenez
+ * Dylan Gonzalez
+ *
+ * Programa: Corrutinas
+ * Archivo:  corrutinas.c
+ */
+
 #include "corrutinas.h"
 
 void agregar_hilo(hilo* nuevo_hilo){ //funcion encargada de insertar un nuevo hilo a la lista de hilos

@@ -1,4 +1,16 @@
-//Proyecto2 SO (Ronald Esquivel, Ricardo Murillo y Dylan Gonzalez)
+/*
+ * Instituto Tecnologico de Costa Rica
+ * Escuela de Ingenieria en Computacion
+ * Sistemas Operativos
+ *
+ * Segundo proyecto de Sistemas Operativos
+ * Ronald Esquivel Lopez
+ * Ricardo Murillo Jimenez
+ * Dylan Gonzalez
+ *
+ * Programa: Corrutinas Header
+ * Archivo:  corrutinas.h
+ */
 
 #ifndef CORRUTINAS_H
 #define CORRUTINAS_H

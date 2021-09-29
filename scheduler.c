@@ -1,3 +1,17 @@
+/*
+ * Instituto Tecnologico de Costa Rica
+ * Escuela de Ingenieria en Computacion
+ * Sistemas Operativos
+ *
+ * Segundo proyecto de Sistemas Operativos
+ * Ronald Esquivel Lopez
+ * Ricardo Murillo Jimenez
+ * Dylan Gonzalez
+ *
+ * Programa: Scheduler
+ * Archivo:  scheduler.c
+ */
+
 #include "scheduler.h"
 
 int Y = (V_SIZE - 30);
@@ -27,7 +41,7 @@ long double powerd (long double x, long int y)
             return (temp * temp) / x;
     }
 }
-//*+++++++++++++++++++funciones+++++++++++++++*
+
 
 //pi 1,6349839
 void pi(parametros* args){ //funcion que recorre en hilo, en este caso calcula el numero pi
@@ -114,7 +128,7 @@ void ex(parametros* args){//funcion que recorre en hilo, en este caso calcula e 
         long double agr = (powerd((long double)args->X, i))/(long double)(factorial(i));
 
         if(sum + agr != INFINITY && sum + agr != -INFINITY){
-            sum += agr; //viene con más pero solo veo m
+            sum += agr; 
         }
 
     }
@@ -148,7 +162,7 @@ void sinxt(parametros* args){ //funcion que recorre en hilo, en este caso calcul
         long double agr = (powerd(-1.0f, i) * (powerd((long double)(args->X), ((2*i) + 1)))) / (long double)(factorial(2*i+1));
 
         if(sum + agr != INFINITY && sum + agr != -INFINITY){
-            sum += agr; //viene con más pero solo veo m
+            sum += agr; 
         }
     }
     en_CPU->desechado = 1; //se desecha el hilo, no hay necesidad de usarlo despues.
@@ -224,11 +238,11 @@ void dibujar_escena(){ //funcion encargada de recorrer toda la lista enlazada de
         actual = actual->siguiente;
     }
     
-    //sleep(1);
+
     glFlush();
 }
 
-void RenderString(float x, float y, void *font, const char* string, const char* id,int r, int g, int b)
+void RenderString(float x, float y, void *font, const char* string, const char* id,int r, int g, int b) //funcion que se encarga de dibujar texto en la GUI de GLUT
 {  
   char *c;
 
@@ -242,7 +256,7 @@ void RenderString(float x, float y, void *font, const char* string, const char* 
   glEnd();
 }
 
-int main(int argc, char** argv){
+int main(int argc, char** argv){ //funcion principal del programa
     srand(time(NULL));
     tiquetes_totales = 0;
     contador_id = 0;
@@ -254,7 +268,22 @@ int main(int argc, char** argv){
 
     for(i = 0; i < procesos; i++){
     	int tiquetes, m, tipo_funcion, x;
-    	scanf("%d %d %d %d", &tiquetes, &m, &tipo_funcion, &x);
+
+    	char cmdline[8];
+
+		scanf(" %[^\n]",cmdline); //agarra toda la linea
+
+   		char * token = strtok(cmdline, " ");
+   		int entrada[4] = {0,0,0,0};
+   		int index = 0;
+
+   		while( token != NULL ) { //cada elemento se le hace un split 
+    		sscanf(token, "%d", &entrada[index]);
+      		token = strtok(NULL, " ");
+      		index++;
+   		}
+
+   		tiquetes = entrada[0];	m = entrada[1];	tipo_funcion = entrada[2];	x = entrada[3];
     	
     	if(tipo_funcion == 1){
 
