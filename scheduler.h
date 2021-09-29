@@ -8,10 +8,10 @@
 #define H_SIZE 1000
 #define V_SIZE 800
 
-#define ANCHO 300
-#define ALTO  20
+#define ANCHO 600
+#define ALTO  17
 
-#define ESPACIO 15 //espacio entre barras de progreso
+#define ESPACIO 10 //espacio entre barras de progreso
 
 
 void RenderString(float x, float y, void *font, const char* string, const char* id,int r, int g, int b);

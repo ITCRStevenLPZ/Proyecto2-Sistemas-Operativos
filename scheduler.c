@@ -53,6 +53,8 @@ void pi(parametros* args){ //funcion que recorre en hilo, en este caso calcula e
     }
 
     en_CPU->desechado = 1; //se desecha el hilo, no hay necesidad de usarlo despues.
+    glutPostRedisplay();
+    dibujar_escena();
     finalizar_hilo();
 }
 
@@ -84,6 +86,8 @@ void ln(parametros* args){//funcion que recorre en hilo, en este caso calcula el
 
     }
     en_CPU->desechado = 1; //se desecha el hilo, no hay necesidad de usarlo despues.
+    glutPostRedisplay();
+    dibujar_escena();
     finalizar_hilo();
 }
 
@@ -115,6 +119,8 @@ void ex(parametros* args){//funcion que recorre en hilo, en este caso calcula e 
 
     }
     en_CPU->desechado = 1; //se desecha el hilo, no hay necesidad de usarlo despues.
+    glutPostRedisplay();
+    dibujar_escena();
     finalizar_hilo();
 }
 
@@ -146,6 +152,8 @@ void sinxt(parametros* args){ //funcion que recorre en hilo, en este caso calcul
         }
     }
     en_CPU->desechado = 1; //se desecha el hilo, no hay necesidad de usarlo despues.
+    glutPostRedisplay();
+    dibujar_escena();
     finalizar_hilo();
 }
 
@@ -154,10 +162,17 @@ void dibujar_escena(){ //funcion encargada de recorrer toda la lista enlazada de
     hilo* actual = primero_lottery;
 
     while(actual != NULL){ 
-        double progreso = (double) actual->i / (double) actual->param->M;
+    	double progreso;
+
+    	if(actual-> desechado == 1){
+    		progreso = 1;
+    	}else{
+    		progreso = (double) actual->i / (double) actual->param->M;
+    	}
+        
         int pos_Y = actual->pos_Y;
 
-        printf("PINTO\n");
+        //printf("PINTO\n");
 
         glColor3f(1,1,1);
         glBegin(GL_QUADS);
@@ -171,6 +186,7 @@ void dibujar_escena(){ //funcion encargada de recorrer toda la lista enlazada de
 
         char* hilo_id;
         sprintf(hilo_id, "%d", actual->id);
+
 
         if(actual->fun_id == 1){
 
@@ -208,7 +224,7 @@ void dibujar_escena(){ //funcion encargada de recorrer toda la lista enlazada de
         actual = actual->siguiente;
     }
     
-    sleep(1);
+    //sleep(1);
     glFlush();
 }
 
@@ -232,25 +248,46 @@ int main(int argc, char** argv){
     contador_id = 0;
     en_CPU = NULL;
 
-    parametros* param =(parametros*)malloc(sizeof(parametros));
-    param->M = 15000;
-    crear_hilo(&pi, (parametros*) param, 50, Y, 1);
+    int procesos, i;
 
-    Y-= (ESPACIO + ALTO);
+    scanf("%d", &procesos);
 
-    parametros* param1 =(parametros*)malloc(sizeof(parametros));
-    param1->M = 2000;
-    param1->X = 2;
-    crear_hilo(&sinxt, (parametros*) param1, 75, Y, 4);
+    for(i = 0; i < procesos; i++){
+    	int tiquetes, m, tipo_funcion, x;
+    	scanf("%d %d %d %d", &tiquetes, &m, &tipo_funcion, &x);
+    	
+    	if(tipo_funcion == 1){
 
-    Y-= (ESPACIO + ALTO);
+    		parametros* param =(parametros*)malloc(sizeof(parametros));
+    		param->M = m;
+    		crear_hilo(&pi, (parametros*) param, tiquetes, Y, tipo_funcion);
 
-    parametros* param2 =(parametros*)malloc(sizeof(parametros));
-    param2->M = 1000;
-    param2->X = 3;
-    crear_hilo(&pi, (parametros*) param2, 150, Y, 1);
+    	}else if(tipo_funcion == 2){
 
-    Y-= (ESPACIO + ALTO);
+    		parametros* param =(parametros*)malloc(sizeof(parametros));
+    		param->M = m;
+    		param->X = x;
+    		crear_hilo(&ln, (parametros*) param, tiquetes, Y, tipo_funcion);
+
+    	}else if(tipo_funcion == 3){
+
+    		parametros* param =(parametros*)malloc(sizeof(parametros));
+    		param->M = m;
+    		param->X = x;
+    		crear_hilo(&ex, (parametros*) param, tiquetes, Y, tipo_funcion);
+
+    	}else if(tipo_funcion == 4){
+
+    		parametros* param =(parametros*)malloc(sizeof(parametros));
+    		param->M = m;
+    		param->X = x;
+    		crear_hilo(&sinxt, (parametros*) param, tiquetes, Y, tipo_funcion);
+
+    	}
+
+    	Y-= (ESPACIO + ALTO);
+
+    }
 
     glutInit(&argc, argv);
   	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
@@ -259,7 +296,9 @@ int main(int argc, char** argv){
   	glClear(GL_COLOR_BUFFER_BIT);
   	gluOrtho2D(-0.5, H_SIZE +0.5, -0.5, V_SIZE + 0.5);
   	glutDisplayFunc(dibujar_escena);
+
   	administrador_hilos();
+
   	glutMainLoop();
 
     
