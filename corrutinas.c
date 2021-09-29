@@ -72,8 +72,10 @@ hilo* sorteo(){ //funcion encargada de sortear el siguiente hilo a entrar al CPU
 
 
 
-void crear_hilo(void* funcion, parametros* param, int tiquetes){ //funcion encargada de crear el hilo y asignarle sus atributos
+void crear_hilo(void* funcion, parametros* param, int tiquetes, int pos_Y, int fun_id){ //funcion encargada de crear el hilo y asignarle sus atributos
     hilo* nodo =(hilo*)malloc(sizeof(hilo));
+    nodo->pos_Y = pos_Y;
+    nodo->fun_id = fun_id;
     nodo->estado = 1; //el hilo esta listo
     nodo->id = contador_id++;
     nodo->tiquetes = tiquetes;
@@ -81,6 +83,7 @@ void crear_hilo(void* funcion, parametros* param, int tiquetes){ //funcion encar
     nodo->param = param;
     nodo->corriendo = 0;
     nodo->desechado = 0;
+    nodo->i = 0;
 
     agregar_lottery(nodo);
 }
@@ -139,166 +142,4 @@ void finalizar_hilo(){ //funcion encargada de eliminar el hilo, aya que este ya 
     }
 }
 
-unsigned long long factorial(int x)
-{
-    unsigned long long aux = 1;
-    while(x > 1) {
-        aux *= x;
-        x--;
-    }
-    return aux;
-}
 
-long double powerd (long double x, long int y)
-{
-    long double temp;
-    if (y == 0)
-    return 1;
-    temp = powerd (x, y / 2);
-    if ((y % 2) == 0) {
-        return temp * temp;
-    } else {
-        if (y > 0)
-            return x * temp * temp;
-        else
-            return (temp * temp) / x;
-    }
-}
-//*+++++++++++++++++++funciones+++++++++++++++*
-
-//pi 1,6349839
-void pi(parametros* args){ //funcion que recorre en hilo, en este caso calcula el numero pi
-    long double sum = 0;
-    int i;
-
-    for (i = 1; i <= args->M; i++){
-        if(i % QUANTUM == 0){
-            printf("CALCULO PI - Iteracion = %d - Resultado por ahora = %Lf \n", i, sum);
-            en_CPU->i = i;
-            en_CPU->sum = sum; //se guarda el entorno local
-            if(sigsetjmp(en_CPU->buffer_hilo,1) == 0){
-                siglongjmp(buffer_administrador,1);      // se pausa el hilo
-            }
-            i = en_CPU->i;
-            sum = en_CPU->sum; //se asigna en el entorno local, el que se guardo antes de que se pausara
-            args = en_CPU->param;
-        }
-        long double pi = (1/(double)powerd(i, 2));
-        sum += pi;
-    }
-
-    en_CPU->desechado = 1; //se desecha el hilo, no hay necesidad de usarlo despues.
-    finalizar_hilo();
-}
-
-//Ln
-void ln(parametros* args){//funcion que recorre en hilo, en este caso calcula el lagoritmo natural de un numero X
-    long double sum = 0;
-    int i;
-    for (i = 1; i <= args->M; i++){
-
-        if(i % QUANTUM == 0){
-            printf("CALCULO LN - Iteracion = %d - Resultado por ahora = %Lf \n", i, sum);
-            en_CPU->i = i;
-            en_CPU->sum = sum; //se guarda el entorno local
-            if(sigsetjmp(en_CPU->buffer_hilo,1) == 0){
-                siglongjmp(buffer_administrador,1);      // se pausa el hilo
-            }
-            i = en_CPU->i;
-            sum = en_CPU->sum; //se asigna en el entorno local, el que se guardo antes de que se pausara
-            args = en_CPU->param;
-        }
-
-        long double agr = powerd(-1.0f, (((long double)(i)+1) * (powerd((long double)args->X,i)/i)));
-         
-        if(sum + agr != INFINITY && sum + agr != -INFINITY){
-            sum += agr; //viene con más pero solo veo m
-        }
-
-    }
-    en_CPU->desechado = 1; //se desecha el hilo, no hay necesidad de usarlo despues.
-    finalizar_hilo();
-}
-
-void ex(parametros* args){//funcion que recorre en hilo, en este caso calcula e elevado a un numero X
-    long double sum = 0;
-    
-    int i;
-    for (i = 0; i <= args->M; i++)
-    {
-        if(i != 0 && i % QUANTUM == 0){
-            printf("CALCULO EULER - Iteracion = %d - Resultado por ahora = %Lf \n", i, sum);
-            en_CPU->i = i;
-            en_CPU->sum = sum; //se guarda el entorno local
-            if(sigsetjmp(en_CPU->buffer_hilo,1) == 0){
-                siglongjmp(buffer_administrador,1);      // se pausa el hilo
-            }
-            i = en_CPU->i;
-            sum = en_CPU->sum; //se asigna en el entorno local, el que se guardo antes de que se pausara
-            args = en_CPU->param;
-        }
-
-        long double agr = (powerd((long double)args->X, i))/(long double)(factorial(i));
-
-        if(sum + agr != INFINITY && sum + agr != -INFINITY){
-            sum += agr; //viene con más pero solo veo m
-        }
-
-    }
-    en_CPU->desechado = 1; //se desecha el hilo, no hay necesidad de usarlo despues.
-    finalizar_hilo();
-}
-
-
-void sinxt(parametros* args){ //funcion que recorre en hilo, en este caso calcula el sen de un numero X
-    long double sum = 0;
-    
-    int i;
-    for (i = 0; i <= args->M; i++)
-    {
-        if(i != 0 && i % QUANTUM == 0){
-            printf("CALCULO SENO - Iteracion = %d - Resultado por ahora = %.15Lf \n", i, sum);
-            en_CPU->i = i;
-            en_CPU->sum = sum; //se guarda el entorno local
-            if(sigsetjmp(en_CPU->buffer_hilo,1) == 0){
-                siglongjmp(buffer_administrador,1);      // se pausa el hilo
-            }
-            i = en_CPU->i;
-            sum = en_CPU->sum; //se asigna en el entorno local, el que se guardo antes de que se pausara
-            args = en_CPU->param;
-        }
-
-        long double agr = (powerd(-1.0f, i) * (powerd((long double)(args->X), ((2*i) + 1)))) / (long double)(factorial(2*i+1));
-
-        if(sum + agr != INFINITY && sum + agr != -INFINITY){
-            sum += agr; //viene con más pero solo veo m
-        }
-    }
-    en_CPU->desechado = 1; //se desecha el hilo, no hay necesidad de usarlo despues.
-    finalizar_hilo();
-}
-
-
-int main(){
-    srand(time(NULL));
-    tiquetes_totales = 0;
-    contador_id = 0;
-    en_CPU = NULL;
-
-    parametros* param =(parametros*)malloc(sizeof(parametros));
-    param->M = 15000;
-    crear_hilo(&pi, (parametros*) param, 50);
-
-    parametros* param1 =(parametros*)malloc(sizeof(parametros));
-    param1->M = 2000;
-    param1->X = 2;
-    crear_hilo(&sinxt, (parametros*) param1, 75);
-
-    parametros* param2 =(parametros*)malloc(sizeof(parametros));
-    param2->M = 1000;
-    param2->X = 3;
-    crear_hilo(&pi, (parametros*) param2, 150);
-
-    administrador_hilos();
-    return 0;
-}

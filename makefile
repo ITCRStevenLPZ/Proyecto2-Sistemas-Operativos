@@ -1,19 +1,19 @@
 #Proyecto2 SO (Ronald Esquivel, Ricardo Murillo y Dylan Gonzalez)
-OBJECTS=corrutinas.o
-OUTPUT=corrutinas
+OBJECTS=scheduler.o corrutinas.o
+OUTPUT=scheduler
 
-#CFLAGS=-I/usr/local/Mesa-3.4/include
-LDLIBS=-lrt -lm
-#LDFLAGS=-L/usr/local/Mesa-3.4/lib -L/usr/X11R6/lib
+CFLAGS=-I/usr/local/Mesa-3.4/include
+#LDLIBS=-lX11 -lglut -lMesaGLU -lMesaGL -lm -lXext -lXmu
+LDLIBS=-lX11 -lglut -lGLU -lGL -lrt -lm -lXext
+LDFLAGS=-L/usr/local/Mesa-3.4/lib -L/usr/X11R6/lib
 
 $(OUTPUT): $(OBJECTS)
-	cc $(OBJECTS) -o $(OUTPUT)  $(LDLIBS)
+	cc $(OBJECTS) -o $(OUTPUT) $(LDLIBS)
 
 #$(CFLAGS) $(LDFLAGS)
-$(OBJECTS):corrutinas.h
+$(OBJECTS):scheduler.h corrutinas.h
 
 clean:
 	rm -f *.o
-	rm -f corrutinas
+	rm -f scheduler
 
-#LDLIBS=-lX11 -lglut -lGLU -lGL -lm -lXext -lpthread -lrt
